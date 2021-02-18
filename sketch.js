@@ -2,9 +2,9 @@
 var database ,dog,dog1,dog2
 var position
 var feed,add
-var foodobject
+var foodObject
 var Feedtime
-var Lastfeed
+var LastFed
 
 function preload()
 
@@ -17,8 +17,8 @@ function setup() {
 	createCanvas(1000, 500);
   database = firebase.database();
   console.log(database);
- 
-  foodobject=new Food()
+  
+  foodObject=new Food()
   dog = createSprite(550,250,10,10);
   dog.addImage(dogimg1)
   dog.scale=0.2
@@ -35,20 +35,29 @@ function setup() {
 } 
 
 function draw(){
- background(46,139,87);
-
- foodobject.display()
- 
- drawSprites();
+  background(46,139,87);
+	
+  lastFed = database.ref('FeedTime');
+  lastFed.on("value", readPosition, showError);
+	
+  if(lastFed >= 12){
+    text(lastFed + 'AM', 500, 100)
+  }else{
+    text(lastFed-12 + 'PM', 500, 100)
+  }
+	
+  foodObject.display()
   
- fill(255,255,254);
- textSize(15);
+  drawSprites();
+  
+  fill(255,255,254);
+  textSize(15);
 
-drawSprites();
+  drawSprites();
 }
 function readPosition(data){
   position = data.val();
-  foodobject.updateFoodStock(position)
+  foodObject.updateFoodStock(position)
 }
 
 function showError(){
@@ -78,9 +87,9 @@ database.ref('/').update({
 function FeedDog(){
 
 dog.addImage(dogimg2)
-foodobject.updateFoodStock(foodobject.getFoodStock()-1)
+foodObject.updateFoodStock(foodObject.getFoodStock()-1)
  database.ref('/').update({
-   Food:foodobject.getFoodStock(),
+   Food:foodObject.getFoodStock(),
    FeedTime:hour ()
  })
 }
